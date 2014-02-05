@@ -1,6 +1,4 @@
-## test
-
-## Quantitative Economics 
+## Quantitative Economics
 
 This repository collects all of the code for [Quantitative Economics](http://quant-econ.net),  an on-line course on quantitative economic modeling authored by [John Stachurski](http://johnstachurski.net) and [Thomas J. Sargent](https://files.nyu.edu/ts43/public/).
 
