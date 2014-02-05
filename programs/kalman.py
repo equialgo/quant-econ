@@ -16,24 +16,39 @@ respectively.
 
 import numpy as np
 from numpy import dot
-from numpy.linalg import inv
+from scipy.linalg import inv
+import riccati
 
 class Kalman:
 
     def __init__(self, A, G, Q, R):
         """
-        Provide initial parameters describing the model.  All arguments should
-        be Python scalars or NumPy ndarrays.
+        Provides initial parameters describing the state space model
+
+            x_{t+1} = A x_t + w_{t+1}       (w_t ~ N(0, Q))
+
+            y_t = G x_t + v_t               (v_t ~ N(0, R))
+        
+        Parameters
+        ============
+        
+        All arguments should be scalars or array_like
 
             * A is n x n
-            * Q is n x n and positive definite
+            * Q is n x n, symmetric and nonnegative definite
             * G is k x n
-            * R is k x k and positive definite
+            * R is k x k, symmetric and nonnegative definite
+
         """
-        self.A = np.array(A, dtype='float32')
-        self.G = np.array(G, dtype='float32')
-        self.Q = np.array(Q, dtype='float32')
-        self.R = np.array(R, dtype='float32')
+        self.A, self.G, self.Q, self.R = map(self.convert, (A, G, Q, R))
+        self.k, self.n = self.G.shape
+
+    def convert(self, x): 
+        """
+        Convert array_like objects (lists of lists, floats, etc.) into well
+        formed 2D NumPy arrays
+        """
+        return np.atleast_2d(np.asarray(x, dtype='float32'))
 
     def set_state(self, x_hat, Sigma):
         """
@@ -45,8 +60,9 @@ class Kalman:
 
         Must be Python scalars or NumPy arrays.
         """
-        self.current_Sigma = np.array(Sigma, dtype='float32')
-        self.current_x_hat = np.array(x_hat, dtype='float32')
+        self.current_Sigma = self.convert(Sigma)
+        self.current_x_hat = self.convert(x_hat)
+        self.current_x_hat.shape = self.n, 1
 
     def prior_to_filtered(self, y):
         """
@@ -64,12 +80,11 @@ class Kalman:
         x_hat, Sigma = self.current_x_hat, self.current_Sigma
 
         # === and then update === #
+        y = self.convert(y)
+        y.shape = self.k, 1
         A = dot(Sigma, G.T)
         B = dot(dot(G, Sigma), G.T) + R
-        if B.shape:  # If B has a shape, then it is multidimensional
-            M = dot(A, inv(B))
-        else:  # Otherwise it's just scalar
-            M = A / B
+        M = dot(A, inv(B))
         self.current_x_hat = x_hat + dot(M, (y - dot(G, x_hat)))
         self.current_Sigma = Sigma  - dot(M, dot(G,  Sigma))
 
@@ -95,3 +110,18 @@ class Kalman:
         self.prior_to_filtered(y)
         self.filtered_to_forecast()
 
+    def stationary_values(self):
+        """
+        Computes the limit of Sigma_t as t goes to infinity by solving the
+        associated Riccati equation.  Computation is via the doubling
+        algorithm (see the documentation in riccati.dare).  Returns the limit
+        and the stationary Kalman gain.
+        """
+        # === simplify notation === #
+        A, Q, G, R = self.A, self.Q, self.G, self.R
+        # === solve Riccati equation, obtain Kalman gain === #
+        Sigma_infinity = riccati.dare(A.T, G.T, R, Q)
+        temp1 = dot(dot(A, Sigma_infinity), G.T)
+        temp2 = inv(dot(G, dot(Sigma_infinity, G.T)) + R)
+        K_infinity = dot(temp1, temp2)
+        return Sigma_infinity, K_infinity
