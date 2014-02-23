@@ -1,7 +1,7 @@
 # coding=utf-8
-__author__ = 'stijn'
+from exercises_part_1.an_introductory_example import my_functions as m
 
-import my_functions as m
+__author__ = 'stijn'
 
 #region Exercise 1
 print '\nExercise 1 - factorial:'
