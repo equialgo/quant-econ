@@ -2,30 +2,31 @@
 __author__ = 'stijn'
 from csv import reader
 
+
 def fib(t):
     if t == 0:
         return 0
     elif t == 1:
         return 1
     else:
-        return fib(t-1)+fib(t-2)
+        return fib(t - 1) + fib(t - 2)
 
 
 def column_iterator(target_file, column_number):
-    f = open(target_file, 'r')
-    data = reader(f)
+    f_handle = open(target_file, 'r')
+    data = reader(f_handle)
     for row in data:
-        yield row[column_number-1]
-    f.close()
+        yield row[column_number - 1]
+    f_handle.close()
 
 
 def line_sum(target_file):
-    f = open(target_file, 'r')
-    sum = 0.0
-    for line in f:
+    f_handle = open(target_file, 'r')
+    line_sum = 0.0
+    for line in f_handle:
         try:
-            sum += float(line)
+            line_sum += float(line)
         except ValueError:
             pass
-    f.close()
-    return sum
+    f_handle.close()
+    return line_sum
