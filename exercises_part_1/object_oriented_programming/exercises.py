@@ -14,8 +14,8 @@ print "ecdf at x = 0.5 for n = 1000 is "+str(F(0.5))
 #endregion
 
 
-#region Exercise 1
-print '\nExercise 1 - polynomial class:'
+#region Exercise 2
+print '\nExercise 2 - polynomial class:'
 coefficients = [1, 2, 3]
 p = mc.Polynomial(coefficients)
 print "P(x=2)= 1*2^0 + 2*2^1 + 3*2^2 is "+str(p(2))
