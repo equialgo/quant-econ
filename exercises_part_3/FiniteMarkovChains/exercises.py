@@ -53,7 +53,7 @@ plt.show()
 #endregion
 
 #beginregrion
-print '/nExercise 2 - Markov page rank'
+print '\nExercise 2 - Markov page rank'
 # read webgraph data; each contains "a -> b;" data
 web_graph_data = open('../programs/web_graph_data.txt')
 web_graph = np.array([re.findall('\w', line) for line in web_graph_data])
@@ -85,7 +85,7 @@ for name, rank in sorted(ranked_nodes.iteritems(), key=itemgetter(1), reverse=1)
 #endregion
 
 #beginregrion
-print '/nExercise 3 - AR(1) Markov approximation'
+print '\nExercise 3 - AR(1) Markov approximation'
 rho = 0.1
 sigma_u = 0.2
 x, P = m.approx_markov(rho, sigma_u, m=5, n=11)
